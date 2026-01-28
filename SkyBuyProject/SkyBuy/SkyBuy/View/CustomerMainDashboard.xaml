@@ -1,0 +1,189 @@
+<Page
+    x:Class="SkyBuy.View.CustomerMainDashboard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    xmlns:sys="using:System"
+    xmlns:local="using:SkyBuy.ViewModel">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <Style x:Key="calendar" TargetType="CalendarView" BasedOn="{StaticResource DefaultCalendarViewStyle}">
+                <Setter Property="MinDate" Value="{x:Bind viewModel.MinDate, Mode=OneWay}" />
+                <Setter Property="MaxDate" Value="{x:Bind viewModel.MaxDate, Mode=OneWay}" />
+                <Setter Property="SelectionMode" Value="Single"/>
+                <Setter Property="FirstDayOfWeek" Value="Monday"/>
+            </Style>
+
+            <Style x:Key="auto_suggest" TargetType="AutoSuggestBox" BasedOn="{StaticResource DefaultAutoSuggestBoxStyle}">
+                <Setter Property="Width" Value="300"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="LightSeaGreen">
+            <Grid Padding="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Content="LOG-OUT"
+                        Command="{x:Bind viewModel.GoBackLoginPageCommand}"/>
+
+                <TextBlock Grid.Column="1"
+                           Text="{x:Bind sys:String.Format('WELCOME TO YOUR ACCOUNT, {0}', viewModel.WelcomeName)}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+
+                <Button Grid.Column="2" Content="MY BOOKINGS">
+                    <Button.Flyout>
+                        <Flyout x:Name="BookingsFlyout" Opened="BookingsFlyout_Opened">
+                            <Grid Width="400" MinHeight="300">
+                                <StackPanel Spacing="10">
+                                    <TextBlock Text="Your Flight History" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                                    <ProgressRing IsActive="{x:Bind viewModel.IsLoading, Mode=OneWay}" 
+                                                  Visibility="{x:Bind viewModel.IsLoading, Mode=OneWay}"/>
+
+                                    <ListView ItemsSource="{x:Bind viewModel.MyBookings, Mode=OneWay}"
+                                              SelectionMode="None"
+                                              MaxHeight="500">
+                                        <ListView.Header>
+                                            <Grid Background="LightGray" Padding="5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Route / Date" FontWeight="Bold"/>
+                                                <TextBlock Grid.Column="1" Text="Ref" FontWeight="Bold" Margin="10,0,0,0"/>
+                                            </Grid>
+                                        </ListView.Header>
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="local:BookingDisplayDTO">
+                                                <StackPanel Padding="5" BorderBrush="LightGray" BorderThickness="0,0,0,1">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{x:Bind Route}" FontWeight="SemiBold"/>
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind Reference}" Foreground="Teal"/>
+                                                    </Grid>
+                                                    <TextBlock Text="{x:Bind DepartureTime}" FontSize="12" Foreground="DimGray"/>
+                                                    <Grid>
+                                                        <TextBlock Text="{x:Bind Status}" FontSize="12" Foreground="DarkGreen"/>
+                                                        <TextBlock Text="{x:Bind sys:String.Format('${0:F2}', Price)}" HorizontalAlignment="Right" FontWeight="Bold"/>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+
+                                    <TextBlock Text="No bookings found." 
+                                               Visibility="{x:Bind viewModel.emptyBooking, Mode=OneWay}"
+                                               HorizontalAlignment="Center" Margin="0,20,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Background="MediumVioletRed">
+            <Grid Padding="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <RadioButtons Grid.Column="0"
+                              Header="Select Ticket Type:"
+                              SelectedIndex="{x:Bind viewModel.SelectedIndex, Mode=TwoWay}"
+                              VerticalAlignment="Center">
+                    <x:String>Two-Way</x:String>
+                    <x:String>One-Way</x:String>
+                </RadioButtons>
+
+                <StackPanel Grid.Column="1" Orientation="Vertical" Spacing="10" VerticalAlignment="Center" Margin="0,30,0,0">
+                    <AutoSuggestBox QueryIcon="Find"
+                                    PlaceholderText="Departure City"
+                                    Style="{StaticResource auto_suggest}"
+                                    TextChanged="AutoSuggestBox1_TextChanged"
+                                    SuggestionChosen="AutoSuggestBox1_SuggestionChosen"
+                                    ItemsSource="{x:Bind viewModel.DepartureSuggestions, Mode=OneWay}"/>
+
+                    <AutoSuggestBox QueryIcon="Find"
+                                    PlaceholderText="Arrival City"
+                                    Style="{StaticResource auto_suggest}"
+                                    TextChanged="AutoSuggestBox2_TextChanged"
+                                    SuggestionChosen="AutoSuggestBox2_SuggestionChosen"
+                                    ItemsSource="{x:Bind viewModel.ArrivalSuggestions, Mode=OneWay}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="25" VerticalAlignment="Center" Margin="0,30,0,0" HorizontalAlignment="Center">
+                    <Button Content="First Date">
+                        <Button.Flyout>
+                            <Flyout Placement="Bottom">
+                                <CalendarView Style="{StaticResource calendar}"
+                                              CalendarViewDayItemChanging="CalendarView_DayItemChanging"
+                                              SelectedDatesChanged="FirstCalendar_SelectedDatesChanged"/>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+
+                    <Button Visibility="{x:Bind viewModel.TwoWaySelected, Mode=OneWay}" Content="Second Date">
+                        <Button.Flyout>
+                            <Flyout Placement="Bottom">
+                                <CalendarView Style="{StaticResource calendar}"
+                                              CalendarViewDayItemChanging="CalendarView_DayItemChanging"
+                                              SelectedDatesChanged="SecondCalendar_SelectedDatesChanged"/>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <TextBlock Text="{x:Bind viewModel.Test, Mode=OneWay}" VerticalAlignment="Center" Foreground="White"/>
+                </StackPanel>
+
+                <Button Grid.Column="3" 
+                        Content="Search" 
+                        Command="{x:Bind viewModel.SearchingCommand}" 
+                        IsEnabled="{x:Bind viewModel.CanSearch, Mode=OneWay}"
+                        Width="150" Height="80"
+                        Margin="10,0,0,0"/>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="DarkSlateGray">
+                <TextBlock Text="SKY BUY" FontSize="48" FontWeight="Bold" Foreground="Beige"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+
+            <Border Grid.Column="1" Padding="20" Background="DimGray">
+                <Image Source="ms-appx:///Assets/plane.png"
+                       Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Height="500"/>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

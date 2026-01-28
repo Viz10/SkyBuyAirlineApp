@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SkyBuy (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "SkyBuy (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

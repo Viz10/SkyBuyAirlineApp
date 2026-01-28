@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SkyBuy.View.RegisterPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SkyBuy.View"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Padding="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="4*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Up -->
+        <Border Grid.Row="0" Background="Pink">
+            <Grid>
+                <Button IsEnabled="{x:Bind RegisterViewModel.NotLoading,Mode=OneWay}" 
+                Command="{x:Bind RegisterViewModel.GoBackBeginPageCommand}" 
+                Content="GO BACK" 
+                VerticalAlignment="Center"  
+                HorizontalAlignment="Left" 
+                Margin="10"/>
+
+                <TextBlock Text="LOGIN INTO SKYBUY" 
+                FontSize="20" 
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Center" 
+                Padding="20"/>
+            </Grid>
+        </Border>
+
+        <!-- Centre -->
+        <Border Grid.Row="1" Background="Pink">
+            <Grid Padding="20">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <!--Labels-->
+                <Border Grid.Column="0" Background="Turquoise">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="EMAIL" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,25,15,0" />
+                        <TextBlock Text="PASSWORD" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,25,15,0" />
+                        <TextBlock Text="CONFIRM PASSWORD" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,25,15,0" />
+                        <TextBlock Text="FIRST NAME" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,25,15,0" />
+                        <TextBlock Text="LAST NAME" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,25,15,0" />
+                        <TextBlock Text="PHONE" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,25,15,0" />
+                        <TextBlock Text="ADDRESS" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,25,15,0" />
+                    </StackPanel>
+                </Border>
+
+                <!--Fields+Error ListView-->
+                <Border Grid.Column="1" Background="SandyBrown">
+
+                    <Grid>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!--Fields-->
+                        <Border Grid.Column="0">
+                            <StackPanel Orientation="Vertical">
+
+                                <TextBox Width="200" MaxLength="50" PlaceholderText="Email" Text="{x:Bind RegisterViewModel.Email, Mode=TwoWay}"  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20,17,0"/>
+                                <PasswordBox Width="200" MaxLength="50" PlaceholderText="Enter your new password" Password="{x:Bind RegisterViewModel.Password, Mode=TwoWay}" PasswordRevealMode="Peek" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20,17,0"/>
+                                <PasswordBox Width="200" MaxLength="50" PlaceholderText="Confirm your password" Password="{x:Bind RegisterViewModel.ConfirmPassword, Mode=TwoWay}" PasswordRevealMode="Peek" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20,17,0"/>
+                                <TextBox Width="200" MaxLength="50" PlaceholderText="First Name" Text="{x:Bind RegisterViewModel.FirstName, Mode=TwoWay}"  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20,17,0"/>
+                                <TextBox Width="200" MaxLength="50" PlaceholderText="Last Name" Text="{x:Bind RegisterViewModel.LastName, Mode=TwoWay}"  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20,17,0"/>
+                                <TextBox Width="200" MaxLength="50" PlaceholderText="Phone" Text="{x:Bind RegisterViewModel.Phone, Mode=TwoWay}"  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20,17,0"/>
+                                <TextBox Width="200" MaxLength="50" PlaceholderText="Adress" Text="{x:Bind RegisterViewModel.Address, Mode=TwoWay}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20,17,0"/>
+
+                            </StackPanel>
+                        </Border>
+
+                        
+                        
+                        <!--Errors-->
+                        <Border Grid.Column="1">
+                            <StackPanel Orientation="Vertical">
+                                <InfoBar MaxWidth="290" IsOpen="{x:Bind RegisterViewModel.Accepted ,Mode=OneWay}" Message="Successfully created an account!" Severity="Success"/>
+                                <ItemsControl  ItemsSource="{x:Bind RegisterViewModel.ValidationErrors,Mode=OneWay}" Visibility="{x:Bind RegisterViewModel.NotAccepted,Mode=OneWay}" HorizontalAlignment="Right">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="x:String">
+                                            <TextBlock Text="{x:Bind}" Foreground="Red" TextWrapping="Wrap" Padding="10"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+
+                    </Grid>
+                </Border>
+                
+                
+            </Grid>
+        </Border>
+
+        <!--Downer-->
+        <Border Grid.Row="2" Background="Pink">
+            <StackPanel Orientation="Vertical">
+                <ProgressRing Visibility="{x:Bind RegisterViewModel.Loading,Mode=OneWay}" IsActive="{x:Bind RegisterViewModel.Loading ,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <Button IsEnabled="{x:Bind RegisterViewModel.NotLoading,Mode=OneWay}" Content="MAKE ACCOUNT" Command="{x:Bind RegisterViewModel.TryRegisterCommand}" VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="0,40,0,0"/>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+            
+</Page>

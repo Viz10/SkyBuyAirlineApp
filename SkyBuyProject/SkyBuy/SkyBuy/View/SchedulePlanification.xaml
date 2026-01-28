@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SkyBuy.View.SchedulePlanification"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SkyBuy.View"
+    xmlns:dto="using:SkyBuy.Data.Model.DTOs"
+    xmlns:helpers="using:SkyBuy.Common.Helpers"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="using:System"
+    mc:Ignorable="d">
+
+    <Grid>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="4*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#2563eb">
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button IsEnabled="{x:Bind ViewModel.NotLoading, Mode=OneWay}" 
+                        Command="{x:Bind ViewModel.GoBackCommand}" 
+                        Content="← GO BACK" 
+                        VerticalAlignment="Center"  
+                        HorizontalAlignment="Left" 
+                        Margin="10"
+                        Grid.Column="0"/>
+
+                <StackPanel Grid.Column="1" Spacing="5" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
+                
+                <TextBlock Text="CREATE FLIGHT SCHEDULE FOR : " 
+                           FontSize="24" 
+                           FontWeight="Bold"
+                           Foreground="White"
+                           VerticalAlignment="Center" 
+                           HorizontalAlignment="Center" 
+                           Padding="20"/>
+                
+                <TextBlock Text="{x:Bind ViewModel.Airline_Division_Iata,Mode=OneWay}" 
+                           FontSize="24" 
+                           FontWeight="Bold"
+                           Foreground="White"
+                           VerticalAlignment="Center" 
+                           HorizontalAlignment="Center" 
+                           Padding="20"/>
+                    
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--Main Content-->
+        <Border Grid.Row="1" Background="#f3f4f6" Padding="20">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Options -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="1">
+                <StackPanel Spacing="20" MaxWidth="800">
+                                                                          
+                    <!--Select Route-->
+                    <Border Background="White" 
+                            CornerRadius="8" 
+                            Padding="20" 
+                            BorderBrush="#e5e7eb" 
+                            BorderThickness="1">
+                        <StackPanel Spacing="15">
+                            <TextBlock Text="Select Route" 
+                                       FontSize="18" 
+                                       FontWeight="SemiBold"
+                                       Foreground="#1f2937"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Spacing="5" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Origin Airport" FontSize="14" Foreground="#6b7280"/>
+                                    <TextBox PlaceholderText="e.g., CLJ" 
+                                             Text="{x:Bind ViewModel.OriginIATA, Mode=TwoWay}"
+                                             MaxLength="3"
+                                             CharacterCasing="Upper"/>
+                                </StackPanel>
+
+                                <TextBlock Grid.Column="1" 
+                                           Text="->" 
+                                           FontSize="24" 
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,5"/>
+
+                                <StackPanel Grid.Column="2" Spacing="5"  VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Destination Airport" FontSize="14" Foreground="#6b7280"/>
+                                    <TextBox PlaceholderText="e.g., LTN" 
+                                             Text="{x:Bind ViewModel.DestinationIATA, Mode=TwoWay}"
+                                             MaxLength="3"
+                                             CharacterCasing="Upper"/>
+                                </StackPanel>
+
+                                <Button Grid.Column="3" 
+                                        Content="Fetch Airlines" 
+                                        Command="{x:Bind ViewModel.FetchFlightsCommand}"
+                                        IsEnabled="{x:Bind ViewModel.NotLoading, Mode=OneWay}"
+                                        VerticalAlignment="Bottom"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,0,0,5"
+                                        Background="#10b981"
+                                        Foreground="White"/>
+                            </Grid>
+
+                        </StackPanel>
+                    </Border>
+
+                    <!--Select Flight from API/Generated Results-->
+                    <Border Background="White" 
+                    CornerRadius="8" 
+                    Padding="20" 
+                    BorderBrush="#e5e7eb" 
+                    BorderThickness="1"
+                    >
+                        <StackPanel Spacing="15">
+                            <TextBlock Text="Select Airline Branch and Flight" 
+                                       FontSize="18" 
+                                       FontWeight="SemiBold"
+                                       Foreground="#1f2937"/>
+
+                            <ListView ItemsSource="{x:Bind ViewModel.RouteOptions, Mode=OneWay}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedRoute, Mode=TwoWay}"
+                                      SelectionMode="Single"
+                                      MaxHeight="200">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="dto:PartialScheduleJsonDTO">
+                                        <Grid Padding="10" Background="#f9fafb" Margin="1" CornerRadius="4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0" 
+                                                       Text="{x:Bind AirlineIATA}" 
+                                                       FontSize="14"
+                                                       Foreground="#6b7280"/>
+                                            <TextBlock Grid.Column="1" 
+                                                       Text="{x:Bind AirlineICAO}" 
+                                                       FontSize="14"
+                                                       Foreground="#6b7280"/>
+                                            <TextBlock Grid.Column="2" 
+                                                       Text="{x:Bind FlightIATA}" 
+                                                       FontSize="14"
+                                                       Foreground="#6b7280"/>
+                                            <TextBlock Grid.Column="3" 
+                                                       Text="{x:Bind FlightICAO}" 
+                                                       FontSize="14"
+                                                       Foreground="#6b7280"/>
+                                            <TextBlock Grid.Column="4" 
+                                                       Text="{x:Bind FlightNumber}" 
+                                                       FontSize="14"
+                                                       Foreground="#6b7280"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+
+                            <TextBlock Text="Auto-generated schedule numbers" Visibility="{x:Bind ViewModel.ScheduleCodesAutoGenerated,Mode=OneWay}" FontSize="14" Foreground="DarkOliveGreen" Margin="20,0,0,0" />
+
+                            </StackPanel>
+                    </Border>
+
+                    <!-- Select Schedule Details -->
+                    <Border Background="White" 
+                    CornerRadius="8" 
+                    Padding="20" 
+                    BorderBrush="#e5e7eb" 
+                    BorderThickness="1"
+                    > 
+                        <StackPanel Spacing="17">
+                            
+                            <TextBlock Text="Schedule Details" 
+                               FontSize="18" 
+                               FontWeight="SemiBold"
+                               Foreground="#1f2937"/>
+
+                                <!--DATES-->
+                                <Border Background="White"  CornerRadius="8" Padding="20"  BorderBrush="PaleVioletRed"  BorderThickness="2">
+                                    <StackPanel Spacing="5" Orientation="Horizontal">
+                                        <TextBlock Text="Operating Days" FontSize="14" Foreground="#6b7280" Grid.Column="0"/>
+                                        <Grid>
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <ItemsControl ItemsSource="{x:Bind ViewModel.DayOptions}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="helpers:FlightDayItem">
+                                                        <CheckBox Content="{x:Bind Name}" IsChecked="{x:Bind IsChecked, Mode=TwoWay}"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                            <StackPanel Spacing="5" HorizontalAlignment="Center" Grid.Column="1" Margin="100, 0, 0, 0">
+                                                <TextBlock Text="Select Fleet Aircraft Type" FontSize="14" Foreground="#6b7280"/>
+                                                <ComboBox FlowDirection="RightToLeft" ItemsSource="{x:Bind ViewModel.AircraftICAOs}" SelectedItem="{x:Bind ViewModel.SelectedAircraftICAO, Mode=TwoWay}" Grid.Column="1"/>
+                                            </StackPanel>
+
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!--TIMES-->
+                                <Border Background="White"  CornerRadius="8" Padding="15"  BorderBrush="CadetBlue"  BorderThickness="2">
+                                    <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto">
+                                        <StackPanel Spacing="5" Orientation="Horizontal">
+                                            <TimePicker ClockIdentifier="24HourClock" Header="Select Local Departure Time"
+                                                        SelectedTime="{x:Bind ViewModel.SelectedDepartureLocalTime,Mode=TwoWay}"
+                                                        MinuteIncrement="15" Margin="50, 0, 50, 0"
+                                                        VerticalAlignment="Center"/>
+                                                <Grid Visibility="{x:Bind ViewModel.ShowScheduleTimes, Mode=OneWay}" MinHeight="130">
+
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                    <TextBlock 
+                                                        Text="{x:Bind sys:String.Format('Departure Local {0}', ViewModel.ScheduleTimes.DepartureOffsetString),Mode=OneWay}"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Margin="0,0,50,0"/>
+                                                    <TextBlock 
+                                                        Text="{x:Bind ViewModel.ScheduleTimes.LocalDepartureTime, Mode=OneWay}"
+                                                        FontWeight="SemiBold"/>
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock 
+                                                        Text="Departure UTC" 
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Margin="0,0,50,0"/>
+                                                    <TextBlock 
+                                                        Text="{x:Bind ViewModel.ScheduleTimes.DepartureTimeUTC, Mode=OneWay}"
+                                                        FontWeight="SemiBold"/>
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                    <TextBlock 
+                                                        Text="Flight average duration:" 
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Margin="0,0,50,0"/>
+                                                    <TextBlock 
+                                                        Text="{x:Bind ViewModel.ScheduleTimes.Duration, Mode=OneWay}"
+                                                        FontWeight="SemiBold"/>
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                                                    <TextBlock 
+                                                        Text="{x:Bind sys:String.Format('Arrival Local {0}', ViewModel.ScheduleTimes.ArrivalOffsetString),Mode=OneWay}" 
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Margin="0,0,50,0"/>
+                                                    <TextBlock 
+                                                        Text="{x:Bind ViewModel.ScheduleTimes.LocalArrivalTime, Mode=OneWay}"
+                                                        FontWeight="SemiBold"/>
+                                                    <TextBlock 
+                                                         Text="+1 day" 
+                                                         Foreground="red"
+                                                         Visibility="{x:Bind ViewModel.ScheduleTimes.IsArrivalNextDay, Mode=OneWay}"/>
+                                                </StackPanel>
+
+                                                <StackPanel Grid.Column="4" VerticalAlignment="Center">
+                                                    <TextBlock 
+                                                        Text="Arriving UTC"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Margin="0,0,50,0"/>
+                                                    <TextBlock 
+                                                        Text="{x:Bind ViewModel.ScheduleTimes.ArrivalTimeUTC, Mode=OneWay}"
+                                                        FontWeight="SemiBold"/>
+                                                    <TextBlock 
+                                                        Text="+1 day" 
+                                                        Foreground="red"
+                                                        Visibility="{x:Bind ViewModel.ScheduleTimes.IsArrivalNextDay, Mode=OneWay}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Border>
+
+                                <!--PRICE + SEASON-->
+                                <Border Background="White"  CornerRadius="8" Padding="20"  BorderBrush="IndianRed"  BorderThickness="2">
+                                    
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                                        <TextBlock Text="Base Reference Airplane Ticket Price(€)" FontSize="13" Foreground="Black"/>
+                                        <NumberBox Value="{x:Bind ViewModel.SelectedBaseReferencePrice, Mode=TwoWay}"
+                                                   Minimum="0" Maximum="10000" SpinButtonPlacementMode="Inline"
+                                                   SmallChange="10" LargeChange="100"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                                    <RadioButtons
+                                        Header="Select Season"
+                                        SelectedIndex="{x:Bind ViewModel.SelectedIndexSeason, Mode=TwoWay}"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <x:String>Winter Season</x:String>
+                                        <x:String>Summer Season</x:String>
+                                    </RadioButtons>
+                                    </StackPanel>
+                                        
+                                    <StackPanel Grid.Column="2" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock Text="{x:Bind ViewModel.WinterIntervalString,Mode=OneWay}" FontSize="14" Foreground="DarkBlue" Margin="0,27,0,0"/>
+                                            <TextBlock Text="{x:Bind ViewModel.SummerIntervalString,Mode=OneWay}" FontSize="14" Foreground="DarkOrange" Margin="0,13,0,0"/>
+                                    </StackPanel>
+
+                                    </Grid>
+                                </Border>
+
+                                <!--Offer shuttle suggestion based on schedule-->
+                                <Border Background="White"  CornerRadius="8" Padding="20"  BorderBrush="MediumSpringGreen"  BorderThickness="2">
+                                    <StackPanel Spacing="5" Orientation="Horizontal">
+                                        <TextBlock Text="Add shuttle type return schedule" FontSize="14" Foreground="Black" VerticalAlignment="Center"/>
+                                        <CheckBox IsChecked="{x:Bind ViewModel.SelectedReturnShuttle, Mode=TwoWay}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+                </ScrollViewer>
+
+                <!--Errors-->
+                <Border Grid.Column="0" Background="Bisque">
+                    <StackPanel Orientation="Vertical">
+                        <InfoBar MaxWidth="290" IsOpen="{x:Bind ViewModel.GoodData ,Mode=OneWay}" Message="Successfully added a schedule!" Severity="Success" HorizontalAlignment="Center"/>
+                        <ItemsControl  ItemsSource="{x:Bind ViewModel.ValidationErrors,Mode=OneWay}" Visibility="{x:Bind ViewModel.HasErrors,Mode=OneWay}" HorizontalAlignment="Center">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <TextBlock Text="{x:Bind}" Foreground="Red" TextWrapping="Wrap" Padding="10"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <ProgressRing IsActive="{x:Bind ViewModel.Loading, Mode=OneWay}" Visibility="{x:Bind ViewModel.Loading, Mode=OneWay}" FontSize="20"/>
+
+                    </StackPanel>
+                </Border>
+
+         </Grid>
+
+        </Border>
+
+        <!--Footer-->
+        <Border Grid.Row="2" Background="YellowGreen" BorderBrush="#e5e7eb" BorderThickness="0,1,0,0">
+            <Button IsEnabled="{x:Bind ViewModel.NotLoading, Mode=OneWay}" 
+        Command="{x:Bind ViewModel.CreateScheduleCommand}" 
+        Content="Check data and add schedule and daily flights" 
+        VerticalAlignment="Center"  
+        HorizontalAlignment="Center"     
+        Margin="10"
+        Grid.Column="0"
+        Style="{StaticResource AccentButtonStyle}"/>
+        </Border>
+    
+    </Grid>
+</Page>

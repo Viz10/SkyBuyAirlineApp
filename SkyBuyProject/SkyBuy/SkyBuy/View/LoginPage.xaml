@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SkyBuy.View.LoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SkyBuy.View"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Padding="20">
+
+            <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Up -->
+        <Border Grid.Row="0" Background="Aqua">
+            <TextBlock Text="LOGIN INTO SKYBUY" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="20"/>
+        </Border>
+
+        <!-- Centre -->
+        <Border Grid.Row="1" Background="RosyBrown">
+            <Grid Padding="20">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="EMAIL" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Right"  Margin="0,100,15,0"/>
+                        <TextBlock Text="PASSWORD" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,25,15,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1">
+                    <StackPanel Orientation="Vertical">
+                        <TextBox
+                        MaxLength="50"
+                         Width="200"   
+                         IsSpellCheckEnabled="False"
+                         PlaceholderText="Enter your email"
+                         Text="{x:Bind LoginViewModel.Email, Mode=TwoWay}" 
+                         VerticalAlignment="Center" HorizontalAlignment="Left"  Margin="0,100,15,0" 
+                        />
+                        <PasswordBox 
+                         Width="200" 
+                         MaxLength="50"
+                         PlaceholderText="Enter your password"
+                         Password="{x:Bind LoginViewModel.Password, Mode=TwoWay}"
+                         PasswordRevealMode="Peek"
+                         VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,20,15,0"
+                        />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="Lime">
+            <StackPanel Orientation="Vertical">
+                <ProgressRing Visibility="{x:Bind LoginViewModel.IsLoading,Mode=OneWay}" IsActive="{x:Bind LoginViewModel.IsLoading ,Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <InfoBar MaxWidth="290" IsOpen="{x:Bind LoginViewModel.LoginBad ,Mode=OneWay}" Message="{x:Bind LoginViewModel.ErrorMsg ,Mode=OneWay}" Severity="Error"/>
+                <Button IsEnabled="{x:Bind LoginViewModel.IsNotLoading}" Command="{x:Bind LoginViewModel.LoginFunctionCommand}" Content="LOGIN" VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="0,40,0,0"/>
+                <HyperlinkButton IsEnabled="{x:Bind LoginViewModel.IsNotLoading}" Command="{x:Bind LoginViewModel.RegisterCommand}" Content="Are you new? Create an account!" VerticalAlignment="Center"  HorizontalAlignment="Center"  Padding="20"/>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</Page>
